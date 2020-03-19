@@ -55,6 +55,13 @@ full example:
     - { name: 'site-name' }
 ```
 
+### Add domains do hosts file
+Edit `C:\Windows\System32\drivers\etc\hosts` in text editor as administrator and add created domains
+```
+127.0.0.1 some-domain.local
+127.0.0.1 other-domain.local
+```
+
 ### Run setup
 `ansible-playbook setup-hosts.yml`
 
