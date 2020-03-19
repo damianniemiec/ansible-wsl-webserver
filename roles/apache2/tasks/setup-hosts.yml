@@ -1,0 +1,32 @@
+- name: Setup configuration files for selected domains
+  template:
+    src: "templates/vhost.j2"
+    dest: "/etc/apache2/sites-available/{{ item.name }}.conf"
+    decrypt: yes
+  loop: "{{ created_domains }}"
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Ensure websites are enabled
+  file:
+    src: "/etc/apache2/sites-available/{{ item.name }}.conf"
+    dest: "/etc/apache2/sites-enabled/{{ item.name }}.conf"
+    state: link
+  loop: "{{ enabled_sites }}"
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  notify:
+    - restart apache2
+- name: Add domains to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1 {{ item.domain }}"
+    state: present
+  loop: "{{ created_domains }}"
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"

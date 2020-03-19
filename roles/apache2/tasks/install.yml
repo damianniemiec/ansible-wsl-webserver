@@ -1,0 +1,39 @@
+- name: Install apache2 server
+  apt:
+    name:
+    - apache2
+    update_cache: yes
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Ensure AcceptFilter http none is present in apache config
+  lineinfile:
+    path: /etc/apache2/apache2.conf
+    line: AcceptFilter http none
+    state: present
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  notify:
+  - restart apache2
+- name: Ensure AcceptFilter https none is present in apache config
+  lineinfile:
+    path: /etc/apache2/apache2.conf
+    line: AcceptFilter https none
+    state: present
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  notify:
+  - restart apache2
+- name: Start service apache2, if not started
+  service:
+    name: apache2
+    state: started
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"

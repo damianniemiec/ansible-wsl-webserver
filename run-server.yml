@@ -1,0 +1,34 @@
+---
+- hosts:
+  - localhost
+  vars:
+    created_databases: []
+    created_domains: []
+    enabled_sites: []
+  tasks:
+  - include_vars:
+      file: "./secrets.yml"
+  - name: Start service mysql, if not started
+    service:
+      name: mysql
+      state: started
+    become: yes
+    become_method: sudo
+    vars:
+      ansible_become_password: "{{ sudo_password }}"
+  - name: Start service apache2, if not started
+    service:
+      name: apache2
+      state: started
+    become: yes
+    become_method: sudo
+    vars:
+      ansible_become_password: "{{ sudo_password }}"
+  - name: Start service php7-fpm, if not started
+    service:
+      name: php7.4-fpm
+      state: started
+    become: yes
+    become_method: sudo
+    vars:
+      ansible_become_password: "{{ sudo_password }}"

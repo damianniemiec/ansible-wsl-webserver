@@ -1,0 +1,21 @@
+- name: Install system software
+  apt:
+    name:
+    - python-pip
+    - python-apt
+    - python-pymysql
+    - git
+    - curl
+    update_cache: yes
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Install nvm
+  shell: >
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+  args:
+    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+- name: Reload profile
+  shell: >
+    . "{{ ansible_env.HOME }}/.bashrc"

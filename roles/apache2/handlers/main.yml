@@ -1,0 +1,8 @@
+- name: restart apache2
+  service:
+    name: apache2
+    state: restarted
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"

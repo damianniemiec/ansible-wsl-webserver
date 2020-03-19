@@ -1,0 +1,9 @@
+- name: Ensure websites are enabled (or disabled)
+  file:
+    src: "/etc/apache2/sites-available/{{ item }}"
+    dest: "/etc/apache2/sites-enabled/{{ item }}"
+    state: link
+  with_items:
+    - "000-default.conf"
+  notify:
+    - restart apache2

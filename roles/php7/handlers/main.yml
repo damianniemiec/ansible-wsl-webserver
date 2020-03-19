@@ -1,0 +1,8 @@
+- name: restart php7
+  service:
+    name: php7.4-fpm
+    state: restarted
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"

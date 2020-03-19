@@ -1,0 +1,63 @@
+- name: Add Mariadb apt key
+  apt_key:
+    url: https://mariadb.org/mariadb_release_signing_key.asc
+    state: present
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Add MariaDB repo
+  apt_repository:
+    repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/ubuntu {{ ansible_distribution_release }} main"
+    state: present
+  when: ansible_distribution == "Ubuntu"
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Add MariaDB repo
+  apt_repository:
+    repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/debian {{ ansible_distribution_release }} main"
+    state: present
+  register: mariadb_debian_repo
+  when: ansible_distribution == "Debian"
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Install MariaDB
+  apt:
+    name:
+    - mariadb-client
+    - mariadb-common
+    - mariadb-server
+    update_cache: yes
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Start service mysql, if not started
+  service:
+    name: mysql
+    state: started
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Removes all anonymous user accounts
+  mysql_user:
+    check_implicit_admin: yes
+    login_user: root
+    login_password:
+    login_host: 127.0.0.1
+    name: ''
+    host_all: yes
+    state: absent
+- name: Create database user
+  mysql_user:
+    login_user: root
+    login_host: 127.0.0.1
+    name: dev
+    password: dev
+    priv: '*.*:ALL'
+    state: present

@@ -1,0 +1,18 @@
+- name: Create new databases
+  mysql_db:
+    login_user: root
+    login_host: 127.0.0.1
+    name: "{{ item.name }}"
+    state: present
+  loop: "{{ created_databases | default([]) }}"
+  when: item.name is defined
+- name: Create database user
+  mysql_user:
+    login_user: root
+    login_host: 127.0.0.1
+    name: "{{ item.user }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.name }}.*:ALL"
+    state: present
+  loop: "{{ created_databases | default([]) }}"
+  when: item.user is defined
