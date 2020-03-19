@@ -3,7 +3,7 @@ How to install ansible: https://docs.ansible.com/ansible/latest/installation_gui
 
 Debian / Ubuntu:  
 * `sudo apt update`  
-* `sudo apt install software-properties-common pwgen python3 python3-pip`  
+* `sudo apt install software-properties-common pwgen nano python python-pip -y`  
 * `sudo apt-add-repository --yes --update ppa:ansible/ansible`  
 * `sudo apt update`  
 * `sudo apt install ansible`  
