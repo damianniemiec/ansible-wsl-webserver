@@ -54,3 +54,9 @@ full example:
     enabled_sites:
     - { name: 'site-name' }
 ```
+
+### Run setup
+`ansible-playbook setup-hosts.yml`
+
+## Run server
+`ansible-playbook run-server.yml`
