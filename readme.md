@@ -3,7 +3,7 @@ How to install ansible: https://docs.ansible.com/ansible/latest/installation_gui
 
 Debian / Ubuntu:  
 * `sudo apt update`  
-* `sudo apt install software-properties-common pwgen python3 python3-pip`  
+* `sudo apt install software-properties-common pwgen nano python python-pip -y`  
 * `sudo apt-add-repository --yes --update ppa:ansible/ansible`  
 * `sudo apt update`  
 * `sudo apt install ansible`  
@@ -60,6 +60,13 @@ Add hosts to `C:\Windows\System32\drivers\etc\hosts`
 ### Run setup
 adjust php_extensions list in setup-hosts.yml and run
 `ansible-playbook setup-hosts.yml`
+
+### Add domains do hosts file
+Edit `C:\Windows\System32\drivers\etc\hosts` in text editor as administrator and add created domains
+```
+127.0.0.1 some-domain.local
+127.0.0.1 other-domain.local
+```
 
 ## Run server
 `ansible-playbook run-server.yml`
