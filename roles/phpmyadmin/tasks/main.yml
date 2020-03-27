@@ -1,0 +1,21 @@
+- name: Install phpMyAdmin
+  apt:
+    name:
+    - phpmyadmin
+    update_cache: yes
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Add phpmyadmin link to default public directory
+  file:
+    src: "/usr/share/phpmyadmin/"
+    dest: "/var/www/html/phpmyadmin"
+    state: link
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  notify:
+      - restart apache2
+      - restart php7

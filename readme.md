@@ -55,8 +55,14 @@ full example:
     - { name: 'site-name' }
 ```
 
+Add hosts to `C:\Windows\System32\drivers\etc\hosts`
+
 ### Run setup
+adjust php_extensions list in setup-hosts.yml and run
 `ansible-playbook setup-hosts.yml`
 
 ## Run server
 `ansible-playbook run-server.yml`
+
+## phpMyAdmin
+use `http://localhost/phpmyadmin` or run `ansible-playbook setup-hosts.yml` and add `pma.local` to windows hosts file

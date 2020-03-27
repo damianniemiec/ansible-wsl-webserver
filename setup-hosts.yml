@@ -3,8 +3,10 @@
   - localhost
   vars:
     created_databases: []
-    created_domains: []
-    enabled_sites: []
+    created_domains:
+    - { name: 'phpmyadmin', domain: 'pma.local', path: '/var/www/html/phpmyadmin' }
+    enabled_sites:
+    - { name: 'phpmyadmin' }
   tasks:
   - include_vars:
       file: "./secrets.yml"

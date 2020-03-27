@@ -49,15 +49,17 @@
   apt:
     name:
     - php7.4-fpm
-    - php7.4-bcmath
-    - php7.4-curl
-    - php7.4-gd
-    - php7.4-intl
-    - php7.4-mysql
-    - php7.4-sqlite3
-    - php7.4-xml
-    - php7.4-zip
     update_cache: yes
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Install PHP7 Extensions
+  apt:
+    name:
+    - "{{ item }}"
+    update_cache: yes
+  loop: "{{ php_extensions }}"
   become: yes
   become_method: sudo
   vars:
@@ -115,6 +117,23 @@
   service:
     name: php7.4-fpm
     state: started
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: Set date.timezone for FPM
+  become: true
+  lineinfile:
+    dest: /etc/php/7.4/fpm/php.ini
+    regexp: "date.timezone ="
+    line: "date.timezone = CET"
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+- name: activate extensions
+  shell: phpenmod {{ item }}
+  loop: "{{ php_extensions }}"
   become: yes
   become_method: sudo
   vars:
