@@ -6,6 +6,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php ]
 - name: Add ppa:ondrej/php repository
   apt_repository:
     repo: ppa:ondrej/php
@@ -15,6 +16,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php ]
 - name: Add dependencies for PHP versions (Debian).
   apt:
     name:
@@ -26,6 +28,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php ]
 - name: Add Ondrej Sury's apt key (Debian).
   apt_key:
     url: https://packages.sury.org/php/apt.gpg
@@ -35,6 +38,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php ]
 - name: Add Ondrej Sury's repo (Debian).
   apt_repository:
     repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
@@ -45,6 +49,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php ]
 - name: Install PHP7
   apt:
     name:
@@ -54,6 +59,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php, php74 ]
 - name: Install PHP7 Extensions
   apt:
     name:
@@ -64,6 +70,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php, php74 ]
 - name: Enable Apache2 module
   apache2_module:
     state: present
@@ -72,6 +79,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php, apache ]
   notify:
   - restart apache2
 - name: Ensure php proxy is present in apache default config
@@ -87,6 +95,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php, apache ]
   notify:
   - restart apache2
 - name: Correct user for php-fpm
@@ -99,6 +108,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php, php74 ]
   notify:
   - restart php7
 - name: Correct group for php-fpm
@@ -111,6 +121,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php, php74 ]
   notify:
   - restart php7
 - name: Start service php7.4-fpm, if not started
@@ -121,8 +132,8 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php, php74 ]
 - name: Set date.timezone for FPM
-  become: true
   lineinfile:
     dest: /etc/php/7.4/fpm/php.ini
     regexp: "date.timezone ="
@@ -131,6 +142,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php, php74 ]
 - name: activate extensions
   shell: phpenmod {{ item }}
   loop: "{{ php_extensions }}"
@@ -138,3 +150,4 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ php, php74 ]

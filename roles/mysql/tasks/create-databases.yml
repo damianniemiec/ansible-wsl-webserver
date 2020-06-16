@@ -6,6 +6,7 @@
     state: present
   loop: "{{ created_databases | default([]) }}"
   when: item.name is defined
+  tags: [ mysql ]
 - name: Create database user
   mysql_user:
     login_user: root
@@ -16,3 +17,4 @@
     state: present
   loop: "{{ created_databases | default([]) }}"
   when: item.user is defined
+  tags: [ mysql ]

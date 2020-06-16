@@ -16,6 +16,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ apache ]
   notify:
   - restart apache2
 - name: Ensure AcceptFilter https none is present in apache config
@@ -27,6 +28,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ apache ]
   notify:
   - restart apache2
 - name: Start service apache2, if not started
@@ -37,3 +39,4 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ apache ]

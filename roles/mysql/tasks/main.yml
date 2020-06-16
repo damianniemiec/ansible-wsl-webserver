@@ -6,6 +6,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ mysql ]
 - name: Add MariaDB repo
   apt_repository:
     repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/ubuntu {{ ansible_distribution_release }} main"
@@ -15,6 +16,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ mysql ]
 - name: Add MariaDB repo
   apt_repository:
     repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/debian {{ ansible_distribution_release }} main"
@@ -25,6 +27,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ mysql ]
 - name: Install MariaDB
   apt:
     name:
@@ -36,6 +39,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ mysql ]
 - name: Start service mysql, if not started
   service:
     name: mysql
@@ -44,6 +48,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ mysql ]
 - name: Removes all anonymous user accounts
   mysql_user:
     check_implicit_admin: yes
@@ -53,6 +58,7 @@
     name: ''
     host_all: yes
     state: absent
+  tags: [ mysql ]
 - name: Create database user
   mysql_user:
     login_user: root
@@ -61,3 +67,4 @@
     password: dev
     priv: '*.*:ALL'
     state: present
+  tags: [ mysql ]
