@@ -64,7 +64,7 @@
   apt:
     name:
     - "{{ item }}"
-    update_cache: yes
+    update_cache: no
   loop: "{{ php_extensions }}"
   become: yes
   become_method: sudo

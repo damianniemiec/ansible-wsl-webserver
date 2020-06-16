@@ -7,6 +7,7 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ phpmyadmin ]
 - name: Add phpmyadmin link to default public directory
   file:
     src: "/usr/share/phpmyadmin/"
@@ -16,6 +17,34 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  tags: [ phpmyadmin ]
+  notify:
+      - restart apache2
+      - restart php7
+- name: Allow login without password
+  lineinfile:
+    path: /etc/phpmyadmin/config.inc.php
+    regexp: //\s*\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] =
+    line: $cfg['Servers'][$i]['AllowNoPassword'] = TRUE;
+    state: present
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  tags: [ phpmyadmin ]
+  notify:
+      - restart apache2
+      - restart php7
+- name: Change blowfish secret with random
+  lineinfile:
+    path: /etc/phpmyadmin/config.inc.php
+    regexp: \$cfg\['blowfish_secret'\] =
+    line: $cfg['blowfish_secret'] = '{{ lookup('password', '/dev/null chars=ascii_letters length=32') }}';
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  tags: [ phpmyadmin ]
   notify:
       - restart apache2
       - restart php7
