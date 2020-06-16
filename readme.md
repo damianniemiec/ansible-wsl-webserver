@@ -7,15 +7,10 @@ Debian / Ubuntu:
 * `sudo apt-add-repository --yes --update ppa:ansible/ansible`  
 * `sudo apt update`  
 * `sudo apt install ansible`  
-* `pwgen 32 1 -y > secrets_pass_file.txt`  
-* `ansible-vault create secrets.yml` or `EDITOR=nano ansible-vault create secrets.yml` to use nano instead of vim  
-* insert sudo password `sudo_password: <your-password>` and save  
 * `ansible-playbook setup-system.yml`
 
 or 
 * `sudo ./bin/ansible_setup.sh`
-* `ansible-vault create secrets.yml` or `EDITOR=nano ansible-vault create secrets.yml` to use nano instead of vim  
-* insert sudo password `sudo_password: <your-password>` and save  
 * `ansible-playbook setup-system.yml`
 
 ## Sites setup

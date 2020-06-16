@@ -1,13 +1,11 @@
 ---
 - hosts:
   - localhost
-  vars:
-    created_databases: []
-    created_domains: []
-    enabled_sites: []
+  vars_prompt:
+  - name: sudo_password
+    prompt: "Enter sudo password"
+    private: yes
   tasks:
-  - include_vars:
-      file: "./secrets.yml"
   - name: Start service mysql, if not started
     service:
       name: mysql

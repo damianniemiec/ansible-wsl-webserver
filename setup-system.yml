@@ -1,6 +1,10 @@
 ---
 - hosts:
   - localhost
+  vars_prompt:
+  - name: sudo_password
+    prompt: "Enter sudo password"
+    private: yes
   vars:
     php_extensions:
     - php7.4-bcmath
@@ -15,8 +19,6 @@
     - php7.4-xml
     - php7.4-zip
   tasks:
-  - include_vars:
-      file: "./secrets.yml"
   - import_role:
       name: "system"
   - import_role:
