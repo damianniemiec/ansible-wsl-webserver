@@ -1,0 +1,22 @@
+---
+- hosts:
+  - localhost
+  vars_prompt:
+  - name: sudo_password
+    prompt: "Enter sudo password"
+    private: yes
+  - name: domain
+    prompt: "Enter domain name"
+    private: no
+    default: "wordpress.local"
+  vars:
+    mysql_user: 'dev'
+    mysql_password: 'dev'
+  tasks:
+  - pause:
+      prompt: "\n\n\nplease enter the path for domain {{ domain }} [/var/www/html/{{ domain }}/public_html]"
+    register: domain_path
+  - set_fact:
+      wordpress_path: '{{ domain_path.user_input if domain_path.user_input else "/var/www/html/" ~ domain ~ "/public_html" }}'
+  - import_role:
+      name: "wordpress"

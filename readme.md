@@ -13,6 +13,10 @@ or
 * `sudo ./bin/ansible_setup.sh`
 * `ansible-playbook setup-system.yml`
 
+Now start powershell and reset distribution
+* `wsl -l` to list all distributions
+* `wsl -t <DistributionName>`
+
 ## Sites setup
 
 ### Databases
@@ -68,3 +72,6 @@ Edit `C:\Windows\System32\drivers\etc\hosts` in text editor as administrator and
 
 ## phpMyAdmin
 use `http://localhost/phpmyadmin` or run `ansible-playbook setup-hosts.yml` and add `pma.local` to windows hosts file
+
+### Wordpress
+To install wordpress run `ansible-playbook setup-wordpress.yml` and follow instructions
