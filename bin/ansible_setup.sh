@@ -1,14 +1,9 @@
 #!/bin/bash
 
 # WSL config
-if [ -d /mnt/c/ ]; then
+if grep -q Microsoft /proc/sys/kernel/osrelease; then
     if [ ! -f /etc/wsl.conf ]; then    
-        echo "[automount]
-        enabled = true
-        root = /mnt/
-        options = \"metadata,umask=22,fmask=11\"
-        [network]
-        generateHosts = true" >> /etc/wsl.conf
+        printf "[automount]\nenabled = true\nroot = /mnt/\noptions = \"metadata,umask=22,fmask=11\"\n[network]\ngenerateHosts = true\n" >> /etc/wsl.conf
     fi
 fi
 

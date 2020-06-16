@@ -18,6 +18,10 @@
     - php7.4-sqlite3
     - php7.4-xml
     - php7.4-zip
+    created_domains:
+    - { name: 'phpmyadmin', domain: 'pma.local', path: '/var/www/html/phpmyadmin' }
+    enabled_sites:
+    - { name: 'phpmyadmin' }
   tasks:
   - import_role:
       name: "system"
@@ -30,3 +34,6 @@
       name: "mysql"
   - import_role:
       name: "phpmyadmin"
+  - import_role:
+      name: "apache2"
+      tasks_from: setup-hosts
