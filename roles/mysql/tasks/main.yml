@@ -69,28 +69,43 @@
     when: ansible_facts['os_family'] == 'Darwin'
     become: no
 
+  - name: Removes root password
+    mysql_user:
+      name: root
+      password:
+      check_implicit_admin: yes
+      login_user: root
+      login_password:
+      login_host: 127.0.0.1
+      host_all: yes
+      state: present
+    tags: [ mysql ]
+    become: "{{ 'yes' if ansible_facts['os_family'] == 'Darwin' else 'no' }}"
+
+  - name: Removes all anonymous user accounts
+    mysql_user:
+      check_implicit_admin: yes
+      login_user: root
+      login_password:
+      login_host: 127.0.0.1
+      name: ''
+      host_all: yes
+      state: absent
+    tags: [ mysql ]
+    become: "{{ 'yes' if ansible_facts['os_family'] == 'Darwin' else 'no' }}"
+    
+  - name: Create database user
+    mysql_user:
+      login_user: root
+      login_host: 127.0.0.1
+      name: dev
+      password: dev
+      priv: '*.*:ALL'
+      state: present
+    tags: [ mysql ]
+    become: "{{ 'yes' if ansible_facts['os_family'] == 'Darwin' else 'no' }}"
+
   become: yes
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
-
-- name: Removes all anonymous user accounts
-  mysql_user:
-    check_implicit_admin: yes
-    login_user: root
-    login_password:
-    login_host: 127.0.0.1
-    name: ''
-    host_all: yes
-    state: absent
-  tags: [ mysql ]
-  
-- name: Create database user
-  mysql_user:
-    login_user: root
-    login_host: 127.0.0.1
-    name: dev
-    password: dev
-    priv: '*.*:ALL'
-    state: present
-  tags: [ mysql ]
