@@ -12,7 +12,7 @@
   - name: Setup configuration files for selected domains
     template:
       src: "templates/vhost.j2"
-      dest: "/private/etc/apache2/vhosts/{{ item.name }}.conf"
+      dest: "/usr/local/etc/httpd/vhosts/{{ item.name }}.conf"
       decrypt: yes
     loop: "{{ created_domains }}"
     tags: [ apache ]
