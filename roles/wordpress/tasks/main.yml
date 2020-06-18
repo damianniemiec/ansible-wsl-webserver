@@ -30,7 +30,7 @@
 
 - name: Download and unpack latest WordPress
   unarchive:
-    src: 'https://wordpress.org/latest.tar.gz'
+    src: "https://wordpress.org/latest.{{ 'zip' if ansible_facts['os_family'] == 'Darwin' else 'tar.gz' }}"
     dest: '{{ wordpress_path }}'
     remote_src: yes
     owner: '{{ ansible_env.USER }}'
