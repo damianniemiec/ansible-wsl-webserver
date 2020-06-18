@@ -80,7 +80,7 @@
   - name: Ensure Mac Os X include vhosts
     lineinfile:
       path: "/usr/local/etc/httpd/httpd.conf"
-      line: Include /usr/local/etc/httpd/vhosts/*.conf
+      line: IncludeOptional /usr/local/etc/httpd/vhosts/*.conf
       state: present
     tags: [ apache ]
     when: ansible_facts['os_family'] == 'Darwin'
