@@ -2,6 +2,7 @@
     ServerName {{ item.domain }}
     ServerAdmin webmaster@{{ item.domain }}
     DocumentRoot {{ item.path }}
+    DirectoryIndex index.php index.html
 
     ErrorLog /var/log/apache2/{{ item.domain }}_error.log
     CustomLog /var/log/apache2/{{ item.domain }}_access.log combined
