@@ -70,16 +70,10 @@
     become: no
 
   - name: Removes root password
-    mysql_user:
-      name: root
-      password:
-      check_implicit_admin: yes
-      login_user: root
-      login_password:
-      login_host: "{{ 'localhost' if ansible_facts['os_family'] == 'Darwin' else '127.0.0.1' }}"
-      state: present
+    command: "mysql -u root -e \"update mysql.user set plugin = '' \""
     tags: [ mysql ]
-    become: "{{ 'yes' if ansible_facts['os_family'] == 'Darwin' else 'no' }}"
+    when: ansible_facts['os_family'] == 'Darwin'
+    become: yes
 
   - name: Removes all anonymous user accounts
     mysql_user:
