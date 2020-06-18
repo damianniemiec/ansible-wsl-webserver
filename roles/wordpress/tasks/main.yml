@@ -1,5 +1,10 @@
 - set_fact:
     wordpress_path: '{{ domain_path.user_input if domain_path.user_input else "/var/www/html/" ~ domain ~ "/public_html" }}'
+  when: ansible_facts['os_family'] == 'Debian'
+
+- set_fact:
+    wordpress_path: '{{ domain_path.user_input if domain_path.user_input else "/usr/local/var/www/" ~ domain ~ "/public_html" }}'
+  when: ansible_facts['os_family'] == 'Darwin'
 
 - name: check paths
   stat: path={{ wordpress_path }}

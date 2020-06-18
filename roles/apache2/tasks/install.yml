@@ -30,26 +30,59 @@
 
   - name: Ensure AcceptFilter http none is present in apache config
     lineinfile:
-      path: "/etc/apache2/{{ 'httpd' if ansible_facts['os_family'] == 'Darwin' else 'apache2' }}.conf"
+      path: "/etc/apache2/apache2.conf"
       line: AcceptFilter http none
       state: present
     tags: [ apache ]
+    when: ansible_facts['os_family'] == 'Debian'
+    notify:
+    - restart apache2
+  
+  - name: Ensure AcceptFilter http none is present in apache config
+    lineinfile:
+      path: "/usr/local/etc/httpd/httpd.conf"
+      line: AcceptFilter http none
+      state: present
+    tags: [ apache ]
+    when: ansible_facts['os_family'] == 'Darwin'
     notify:
     - restart apache2
 
   - name: Ensure AcceptFilter https none is present in apache config
     lineinfile:
-      path: "/etc/apache2/{{ 'httpd' if ansible_facts['os_family'] == 'Darwin' else 'apache2' }}.conf"
+      path: "/etc/apache2/apache2.conf"
       line: AcceptFilter https none
       state: present
     tags: [ apache ]
+    when: ansible_facts['os_family'] == 'Debian'
+    notify:
+    - restart apache2
+
+  - name: Ensure AcceptFilter https none is present in apache config
+    lineinfile:
+      path: "/usr/local/etc/httpd/httpd.conf"
+      line: AcceptFilter https none
+      state: present
+    tags: [ apache ]
+    when: ansible_facts['os_family'] == 'Darwin'
     notify:
     - restart apache2
 
   - name: Ensure Mac Os X include vhosts
     lineinfile:
-      path: "/etc/apache2/{{ 'httpd' if ansible_facts['os_family'] == 'Darwin' else 'apache2' }}.conf"
-      line: Include /private/etc/apache2/vhosts/*.conf
+      path: "/usr/local/etc/httpd/httpd.conf"
+      line: Include /usr/local/etc/httpd/vhosts/*.conf
+      state: present
+    tags: [ apache ]
+    when: ansible_facts['os_family'] == 'Darwin'
+    notify:
+    - restart apache2
+
+  - name: change default port to 80
+    lineinfile:
+      path: "/usr/local/etc/httpd/httpd.conf"
+      regexp: "^Listen "
+      line: Listen 80
       state: present
     tags: [ apache ]
     when: ansible_facts['os_family'] == 'Darwin'

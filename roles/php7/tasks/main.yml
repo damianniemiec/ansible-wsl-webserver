@@ -20,7 +20,8 @@
       name: dirmngr
       state: latest
     tags: [ php ]
-    become: "{{ 'no' if ansible_facts['os_family'] == 'Darwin' else 'yes' }}"
+    become: yes
+    when: ansible_facts['os_family'] == 'Debian'
 
   - name: Add ppa:ondrej/php repository
     apt_repository:
@@ -59,7 +60,27 @@
       - php7.4-fpm
       state: latest
     tags: [ php, php74 ]
-    become: "{{ 'no' if ansible_facts['os_family'] == 'Darwin' else 'yes' }}"
+    become: yes
+    when: ansible_facts['os_family'] == 'Debian'
+
+  - name: Install PHP7
+    homebrew:
+      name: php@7.4
+      state: present
+    tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Darwin'
+
+  - name: Copy PHP configuration file
+    copy:
+      src: /private/etc/php-fpm.conf.default
+      dest: /private/etc/php-fpm.conf
+    when: ansible_facts['os_family'] == 'Darwin'
+  
+  - name: Copy PHP configuration file
+    copy:
+      src: /private/etc/php-fpm.d/www.conf.default
+      dest: /private/etc/php-fpm.d/www.conf
+    when: ansible_facts['os_family'] == 'Darwin'
 
   - name: Install PHP7 Extensions
     package:
@@ -69,6 +90,7 @@
     loop: "{{ php_extensions }}"
     tags: [ php, php74 ]
     become: "{{ 'no' if ansible_facts['os_family'] == 'Darwin' else 'yes' }}"
+    when: ansible_facts['os_family'] == 'Debian'
 
   - name: Enable Apache2 module
     apache2_module:
@@ -102,6 +124,17 @@
     when: ansible_facts['os_family'] == 'Debian'
     notify:
     - restart php7
+  
+  - name: Correct user for php-fpm
+    lineinfile:
+      path: /usr/local/etc/php/7.2/php-fpm.d/www.conf 
+      regexp: '^user ='
+      line: "user = {{ ansible_env.USER }}"
+      state: present
+    tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Darwin'
+    notify:
+    - restart php7
 
   - name: Correct group for php-fpm
     lineinfile:
@@ -113,12 +146,29 @@
     when: ansible_facts['os_family'] == 'Debian'
     notify:
     - restart php7
+  
+  - name: Correct group for php-fpm
+    lineinfile:
+      path: /usr/local/etc/php/7.2/php-fpm.d/www.conf 
+      regexp: '^group ='
+      line: "group = staff"
+      state: present
+    tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Darwin'
+    notify:
+    - restart php7
 
   - name: Start service php7.4-fpm, if not started
     service:
       name: php7.4-fpm
       state: started
     tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Debian'
+  
+  - name: Start service php7.4-fpm, if not started
+    command: "php-fpm"
+    tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Darwin'
 
   - name: Set date.timezone for FPM
     lineinfile:
@@ -127,6 +177,14 @@
       line: "date.timezone = CET"
     tags: [ php, php74 ]
     when: ansible_facts['os_family'] == 'Debian'
+
+  - name: Set date.timezone for FPM
+    lineinfile:
+      dest: /usr/local/etc/php/7.4/php.ini
+      regexp: "date.timezone ="
+      line: "date.timezone = CET"
+    tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Darwin'
 
   - name: activate extensions
     shell: phpenmod {{ item }}
