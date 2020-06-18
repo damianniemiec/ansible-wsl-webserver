@@ -17,9 +17,7 @@
     fail: msg="Do not run ansible-playbook as root"
     when: ansible_env.USER == 'root'
   - pause:
-      prompt: "\n\n\nplease enter the path for domain {{ domain }} [/var/www/html/{{ domain }}/public_html]"
+      prompt: "\n\n\nplease enter the path for domain {{ domain }} [{{ '/usr/local/var/www/' if ansible_facts['os_family'] == 'Darwin' else '/var/www/html/' }}{{ domain }}/public_html]"
     register: domain_path
-  - set_fact:
-      wordpress_path: '{{ domain_path.user_input if domain_path.user_input else "/var/www/html/" ~ domain ~ "/public_html" }}'
   - import_role:
       name: "wordpress"

@@ -20,7 +20,7 @@
     state: directory
     mode: '0755'
     owner: '{{ ansible_env.USER }}'
-    group: '{{ ansible_env.USER }}'
+    group: "{{ 'admin' if ansible_facts['os_family'] == 'Darwin' else ansible_env.USER }}"
     recurse: yes
   become: yes
   become_method: sudo
@@ -34,7 +34,7 @@
     dest: '{{ wordpress_path }}'
     remote_src: yes
     owner: '{{ ansible_env.USER }}'
-    group: '{{ ansible_env.USER }}'
+    group: "{{ 'admin' if ansible_facts['os_family'] == 'Darwin' else ansible_env.USER }}"
     mode: '0755'
   become: yes
   become_method: sudo
@@ -81,7 +81,7 @@
     src: "files/wp-config.php.j2"
     dest: "{{ wordpress_path }}/wp-config.php"
     owner: '{{ ansible_env.USER }}'
-    group: '{{ ansible_env.USER }}'
+    group: "{{ 'admin' if ansible_facts['os_family'] == 'Darwin' else ansible_env.USER }}"
     mode: '0755'
   become: yes
   become_method: sudo
