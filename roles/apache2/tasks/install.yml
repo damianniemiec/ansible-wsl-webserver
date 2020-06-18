@@ -87,6 +87,14 @@
     notify:
     - restart apache2
 
+  - name: Add default vhost
+    synchronize:
+      src: "files/000-default.conf"
+      dest: "/usr/local/etc/httpd/vhosts/"
+      delete: no
+      perms: no
+    when: ansible_facts['os_family'] == 'Darwin'
+
   - name: change default port to 80
     lineinfile:
       path: "/usr/local/etc/httpd/httpd.conf"
