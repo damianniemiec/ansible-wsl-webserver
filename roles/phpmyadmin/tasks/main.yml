@@ -28,6 +28,18 @@
       dest: "/var/www/html/phpmyadmin"
       state: link
     tags: [ phpmyadmin ]
+    when: ansible_facts['os_family'] == 'Debian'
+    notify:
+        - restart apache2
+        - restart php7
+
+  - name: Add phpmyadmin link to default public directory
+    file:
+      src: "/usr/local/share/phpmyadmin/"
+      dest: "/usr/local/var/www/phpmyadmin"
+      state: link
+    tags: [ phpmyadmin ]
+    when: ansible_facts['os_family'] == 'Darwin'
     notify:
         - restart apache2
         - restart php7
@@ -43,6 +55,18 @@
     notify:
         - restart apache2
         - restart php7
+    
+  - name: Allow login without password
+    lineinfile:
+      path: /usr/local/etc/phpmyadmin.config.inc.php
+      regexp: $cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] =
+      line: $cfg['Servers'][$i]['AllowNoPassword'] = TRUE;
+      state: present
+    tags: [ phpmyadmin ]
+    when: ansible_facts['os_family'] == 'Darwin'
+    notify:
+        - restart apache2
+        - restart php7
 
   - name: Change blowfish secret with random
     lineinfile:
@@ -51,6 +75,17 @@
       line: $cfg['blowfish_secret'] = '{{ lookup('password', '/dev/null chars=ascii_letters length=32') }}';
     tags: [ phpmyadmin ]
     when: ansible_facts['os_family'] == 'Debian'
+    notify:
+        - restart apache2
+        - restart php7
+
+  - name: Change blowfish secret with random
+    lineinfile:
+      path: /etc/phpmyadmin/config.inc.php
+      regexp: \$cfg\['blowfish_secret'\] =
+      line: $cfg['blowfish_secret'] = '{{ lookup('password', '/dev/null chars=ascii_letters length=32') }}';
+    tags: [ phpmyadmin ]
+    when: ansible_facts['os_family'] == 'Darwin'
     notify:
         - restart apache2
         - restart php7
