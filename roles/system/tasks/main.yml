@@ -33,6 +33,13 @@
       - git
       - curl
       state: latest
+
+  - name: Install python modules with pip
+    pip:
+      name:
+        - pymysql
+        - docker
+    when: ansible_facts['os_family'] == 'Darwin'
   
   become: "{{ 'no' if ansible_facts['os_family'] == 'Darwin' else 'yes' }}"
   become_method: sudo
@@ -48,6 +55,7 @@
         - pymysql
         - docker
       extra_args: --user
+    when: ansible_facts['os_family'] == 'Debian'
     
   - name: Install nvm
     shell: >
