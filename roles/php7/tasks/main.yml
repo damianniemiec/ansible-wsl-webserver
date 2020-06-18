@@ -152,9 +152,9 @@
 
   - name: Correct log path for php-fpm
     lineinfile:
-      path: /usr/local/etc/php/7.4/php-fpm.d/www.conf 
-      regexp: '^php_admin_value[error_log] = '
-      line: "php_admin_value[error_log] = /var/log/fpm-php.www.log"
+      path: /usr/local/etc/php/7.4/php-fpm.conf
+      regexp: '^error_log = '
+      line: "error_log = /var/log/php-fpm.log"
       state: present
     tags: [ php, php74 ]
     when: ansible_facts['os_family'] == 'Darwin'
