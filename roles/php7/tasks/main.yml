@@ -150,6 +150,17 @@
     notify:
     - restart php7
 
+  - name: Correct log path for php-fpm
+    lineinfile:
+      path: /usr/local/etc/php/7.4/php-fpm.d/www.conf 
+      regexp: '^php_admin_value[error_log] = '
+      line: "php_admin_value[error_log] = /var/log/fpm-php.www.log"
+      state: present
+    tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Darwin'
+    notify:
+    - restart php7
+
   - name: Start service php7.4-fpm, if not started
     service:
       name: php7.4-fpm
