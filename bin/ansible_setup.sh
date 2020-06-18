@@ -44,5 +44,7 @@ if [[ "$unamestr" == 'Linux' ]]; then
         echo "This script works only with Debian and Ubuntu (for now)"
     fi
 elif [[ "$unamestr" == 'Darwin' ]]; then
-    easy_install pip
+    sudo easy_install pip
+    pip install ansible --user
+    export PATH="/Users/$USER/Library/Python/2.7/bin:$PATH"
 fi

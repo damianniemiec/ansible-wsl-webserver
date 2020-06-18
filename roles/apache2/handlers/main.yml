@@ -6,3 +6,13 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: restart apache2
+  shell: > 
+    apachectl restart
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  when: ansible_facts['os_family'] == 'Darwin'
