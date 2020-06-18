@@ -1,11 +1,14 @@
 - set_fact:
     wordpress_path: '{{ domain_path.user_input if domain_path.user_input else "/var/www/html/" ~ domain ~ "/public_html" }}'
+
 - name: check paths
   stat: path={{ wordpress_path }}
   register: wordpress_files
+
 - name: Check for existing installations
-  fail: msg="This host has already had this playbook run against it"
+  fail: msg="This host has already had this playbook run against it. If you want to run again execute `sudo rm -rf {{ wordpress_path }}` and retry."
   when: wordpress_files.stat.exists
+
 - name: Create document root
   file:
     path: "{{ wordpress_path }}"
@@ -19,6 +22,7 @@
   vars:
     ansible_become_password: "{{ sudo_password }}"
   tags: [ apache ]
+
 - name: Download and unpack latest WordPress
   unarchive:
     src: 'https://wordpress.org/latest.tar.gz'
@@ -32,31 +36,41 @@
   vars:
     ansible_become_password: "{{ sudo_password }}"
   tags: [ wordpress ]
+
 - shell: mv {{ wordpress_path }}/wordpress/* {{ wordpress_path }}
   tags: [ wordpress ]
+
 - name: Remove empty wordpress directory
   file:
     path: "{{ wordpress_path }}/wordpress"
     state: absent
   tags: [ wordpress ]
+
 - block:
+
   - set_fact:
       mysql_db: 'wp_{{ 10000 | random }}'
+
   - set_fact:
       created_databases:
       - { name: '{{ mysql_db }}' }
+
   - include_role:
       name: mysql
       tasks_from: create-databases
   rescue:
+
   - set_fact:
       mysql_db: 'wp_{{ 10000 | random }}'
+
   - set_fact:
       created_databases:
       - { name: '{{ mysql_db }}' }
+
   - include_role:
       name: mysql
       tasks_from: create-databases
+
 - name: Copy wp-config
   template:
     src: "files/wp-config.php.j2"
@@ -69,6 +83,7 @@
   vars:
     ansible_become_password: "{{ sudo_password }}"
   tags: [ wordpress ]
+
 - name: Setup domain
   set_fact:
     created_domains:
@@ -76,8 +91,10 @@
     enabled_sites:
     - { name: '{{ domain }}' }
   tags: [ wordpress ]
+
 - include_role:
     name: "apache2"
     tasks_from: setup-hosts
+    
 - debug:
     msg: 'If run in WSL add `127.0.0.1 {{ domain }}` to `C:\Windows\System32\drivers\etc\hosts`'

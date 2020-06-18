@@ -1,3 +1,12 @@
+# Installed software
+* Apache2
+* PHP7.4
+* MariaDB
+* NVM
+* Homebrew
+* PHPMyAdmin
+* Wordpress
+
 # Ansible system setup
 How to install ansible: https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-ubuntu
 

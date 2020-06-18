@@ -6,26 +6,27 @@
     prompt: "Enter sudo password"
     private: yes
   tasks:
-  - name: Start service mysql, if not started
-    service:
-      name: mysql
-      state: started
-    become: yes
-    become_method: sudo
-    vars:
-      ansible_become_password: "{{ sudo_password }}"
-  - name: Start service apache2, if not started
-    service:
-      name: apache2
-      state: started
-    become: yes
-    become_method: sudo
-    vars:
-      ansible_become_password: "{{ sudo_password }}"
-  - name: Start service php7-fpm, if not started
-    service:
-      name: php7.4-fpm
-      state: started
+  
+  - name: Check current user
+    fail: msg="Do not run ansible-playbook as root"
+    when: ansible_env.USER == 'root'
+  
+  - block:
+    - name: Start service mysql, if not started
+      service:
+        name: mysql
+        state: started
+    
+    - name: Start service apache2, if not started
+      service:
+        name: apache2
+        state: started
+    
+    - name: Start service php7-fpm, if not started
+      service:
+        name: php7.4-fpm
+        state: started
+      
     become: yes
     become_method: sudo
     vars:

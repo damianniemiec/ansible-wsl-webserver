@@ -12,6 +12,9 @@
     enabled_sites:
     - { name: 'phpmyadmin' }
   tasks:
+  - name: Check current user
+    fail: msg="Do not run ansible-playbook as root"
+    when: ansible_env.USER == 'root'
   - import_role:
       name: "apache2"
       tasks_from: setup-hosts

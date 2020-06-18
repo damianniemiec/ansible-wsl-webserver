@@ -1,153 +1,136 @@
-- name: Ensure dirmngr is installed (gnupg dependency).
+- name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
   apt:
-    name: dirmngr
-    state: present
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php ]
-- name: Add ppa:ondrej/php repository
-  apt_repository:
-    repo: ppa:ondrej/php
-    state: present
-  when: ansible_distribution == "Ubuntu"
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php ]
-- name: Add dependencies for PHP versions (Debian).
-  apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-    state: present
-  when: ansible_distribution == "Debian"
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php ]
-- name: Add Ondrej Sury's apt key (Debian).
-  apt_key:
-    url: https://packages.sury.org/php/apt.gpg
-    state: present
-  when: ansible_distribution == "Debian"
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php ]
-- name: Add Ondrej Sury's repo (Debian).
-  apt_repository:
-    repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
-    state: present
-  register: php_ondrej_debian_repo
-  when: ansible_distribution == "Debian"
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php ]
-- name: Install PHP7
-  apt:
-    name:
-    - php7.4-fpm
     update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_facts['os_family'] == 'Debian'
   become: yes
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
-  tags: [ php, php74 ]
-- name: Install PHP7 Extensions
-  apt:
-    name:
-    - "{{ item }}"
-    update_cache: no
-  loop: "{{ php_extensions }}"
+
+- name: Update homebrew cache
+  homebrew:
+    update_homebrew: yes
+  when: ansible_facts['os_family'] == 'Darwin'
+
+- block:
+
+  - name: Ensure dirmngr is installed (gnupg dependency).
+    package:
+      name: dirmngr
+      state: latest
+    tags: [ php ]
+
+  - name: Add ppa:ondrej/php repository
+    apt_repository:
+      repo: ppa:ondrej/php
+      state: present
+    tags: [ php ]
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Add dependencies for PHP versions (Debian).
+    package:
+      name:
+        - apt-transport-https
+        - ca-certificates
+      state: latest
+    tags: [ php ]
+    when: ansible_distribution == "Debian"
+
+  - name: Add Ondrej Sury's apt key (Debian).
+    apt_key:
+      url: https://packages.sury.org/php/apt.gpg
+      state: present
+    tags: [ php ]
+    when: ansible_distribution == "Debian"
+
+  - name: Add Ondrej Sury's repo (Debian).
+    apt_repository:
+      repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
+      state: present
+    register: php_ondrej_debian_repo
+    tags: [ php ]
+    when: ansible_distribution == "Debian"
+
+  - name: Install PHP7
+    package:
+      name:
+      - php7.4-fpm
+      state: latest
+    tags: [ php, php74 ]
+
+  - name: Install PHP7 Extensions
+    package:
+      name:
+      - "{{ item }}"
+      state: latest
+    loop: "{{ php_extensions }}"
+    tags: [ php, php74 ]
+
+  - name: Enable Apache2 module
+    apache2_module:
+      state: present
+      name: proxy_fcgi
+    tags: [ php, apache ]
+    notify:
+    - restart apache2
+
+  - name: Ensure php proxy is present in apache default config
+    blockinfile:
+      path: /etc/apache2/sites-available/000-default.conf
+      block: |8
+                <FilesMatch \.php$>
+                    SetHandler "proxy:unix:/var/run/php/php7.4-fpm.sock|fcgi://localhost"
+                </FilesMatch>
+      insertbefore: "</VirtualHost>"
+      state: present
+    tags: [ php, apache ]
+    when: ansible_facts['os_family'] == 'Debian'
+    notify:
+    - restart apache2
+
+  - name: Correct user for php-fpm
+    lineinfile:
+      path: /etc/php/7.4/fpm/pool.d/www.conf
+      regexp: '^user ='
+      line: "user = {{ ansible_env.USER }}"
+      state: present
+    tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Debian'
+    notify:
+    - restart php7
+
+  - name: Correct group for php-fpm
+    lineinfile:
+      path: /etc/php/7.4/fpm/pool.d/www.conf
+      regexp: '^group ='
+      line: "group = {{ ansible_env.USER }}"
+      state: present
+    tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Debian'
+    notify:
+    - restart php7
+
+  - name: Start service php7.4-fpm, if not started
+    service:
+      name: php7.4-fpm
+      state: started
+    tags: [ php, php74 ]
+
+  - name: Set date.timezone for FPM
+    lineinfile:
+      dest: /etc/php/7.4/fpm/php.ini
+      regexp: "date.timezone ="
+      line: "date.timezone = CET"
+    tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Debian'
+
+  - name: activate extensions
+    shell: phpenmod {{ item }}
+    loop: "{{ php_extensions }}"
+    tags: [ php, php74 ]
+
   become: yes
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
-  tags: [ php, php74 ]
-- name: Enable Apache2 module
-  apache2_module:
-    state: present
-    name: proxy_fcgi
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php, apache ]
-  notify:
-  - restart apache2
-- name: Ensure php proxy is present in apache default config
-  blockinfile:
-    path: /etc/apache2/sites-available/000-default.conf
-    block: |8
-              <FilesMatch \.php$>
-                  SetHandler "proxy:unix:/var/run/php/php7.4-fpm.sock|fcgi://localhost"
-              </FilesMatch>
-    insertbefore: "</VirtualHost>"
-    state: present
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php, apache ]
-  notify:
-  - restart apache2
-- name: Correct user for php-fpm
-  lineinfile:
-    path: /etc/php/7.4/fpm/pool.d/www.conf
-    regexp: '^user ='
-    line: "user = {{ ansible_env.USER }}"
-    state: present
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php, php74 ]
-  notify:
-  - restart php7
-- name: Correct group for php-fpm
-  lineinfile:
-    path: /etc/php/7.4/fpm/pool.d/www.conf
-    regexp: '^group ='
-    line: "group = {{ ansible_env.USER }}"
-    state: present
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php, php74 ]
-  notify:
-  - restart php7
-- name: Start service php7.4-fpm, if not started
-  service:
-    name: php7.4-fpm
-    state: started
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php, php74 ]
-- name: Set date.timezone for FPM
-  lineinfile:
-    dest: /etc/php/7.4/fpm/php.ini
-    regexp: "date.timezone ="
-    line: "date.timezone = CET"
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php, php74 ]
-- name: activate extensions
-  shell: phpenmod {{ item }}
-  loop: "{{ php_extensions }}"
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ php, php74 ]

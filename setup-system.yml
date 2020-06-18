@@ -1,10 +1,12 @@
 ---
-- hosts:
-  - localhost
+- hosts: localhost
+  connection: local
+  
   vars_prompt:
   - name: sudo_password
     prompt: "Enter sudo password"
     private: yes
+
   vars:
     php_extensions:
     - php7.4-bcmath
@@ -22,7 +24,11 @@
     - { name: 'phpmyadmin', domain: 'pma.local', path: '/var/www/html/phpmyadmin' }
     enabled_sites:
     - { name: 'phpmyadmin' }
+
   tasks:
+  - name: Check current user
+    fail: msg="Do not run ansible-playbook as root"
+    when: ansible_env.USER == 'root'
   - import_role:
       name: "system"
   - import_role:

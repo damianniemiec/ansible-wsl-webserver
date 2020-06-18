@@ -1,50 +1,60 @@
-- name: Install phpMyAdmin
+- name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
   apt:
-    name:
-    - phpmyadmin
     update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_facts['os_family'] == 'Debian'
   become: yes
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
-  tags: [ phpmyadmin ]
-- name: Add phpmyadmin link to default public directory
-  file:
-    src: "/usr/share/phpmyadmin/"
-    dest: "/var/www/html/phpmyadmin"
-    state: link
+
+- name: Update homebrew cache
+  homebrew:
+    update_homebrew: yes
+  when: ansible_facts['os_family'] == 'Darwin'
+
+- block:
+  - name: Install phpMyAdmin
+    package:
+      name:
+      - phpmyadmin
+      state: latest
+    tags: [ phpmyadmin ]
+
+  - name: Add phpmyadmin link to default public directory
+    file:
+      src: "/usr/share/phpmyadmin/"
+      dest: "/var/www/html/phpmyadmin"
+      state: link
+    tags: [ phpmyadmin ]
+    notify:
+        - restart apache2
+        - restart php7
+
+  - name: Allow login without password
+    lineinfile:
+      path: /etc/phpmyadmin/config.inc.php
+      regexp: //\s*\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] =
+      line: $cfg['Servers'][$i]['AllowNoPassword'] = TRUE;
+      state: present
+    tags: [ phpmyadmin ]
+    when: ansible_facts['os_family'] == 'Debian'
+    notify:
+        - restart apache2
+        - restart php7
+
+  - name: Change blowfish secret with random
+    lineinfile:
+      path: /etc/phpmyadmin/config.inc.php
+      regexp: \$cfg\['blowfish_secret'\] =
+      line: $cfg['blowfish_secret'] = '{{ lookup('password', '/dev/null chars=ascii_letters length=32') }}';
+    tags: [ phpmyadmin ]
+    when: ansible_facts['os_family'] == 'Debian'
+    notify:
+        - restart apache2
+        - restart php7
+
   become: yes
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
-  tags: [ phpmyadmin ]
-  notify:
-      - restart apache2
-      - restart php7
-- name: Allow login without password
-  lineinfile:
-    path: /etc/phpmyadmin/config.inc.php
-    regexp: //\s*\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] =
-    line: $cfg['Servers'][$i]['AllowNoPassword'] = TRUE;
-    state: present
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ phpmyadmin ]
-  notify:
-      - restart apache2
-      - restart php7
-- name: Change blowfish secret with random
-  lineinfile:
-    path: /etc/phpmyadmin/config.inc.php
-    regexp: \$cfg\['blowfish_secret'\] =
-    line: $cfg['blowfish_secret'] = '{{ lookup('password', '/dev/null chars=ascii_letters length=32') }}';
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ phpmyadmin ]
-  notify:
-      - restart apache2
-      - restart php7

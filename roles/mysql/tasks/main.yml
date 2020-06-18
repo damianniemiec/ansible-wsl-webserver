@@ -1,54 +1,71 @@
-- name: Add Mariadb apt key
-  apt_key:
-    url: https://mariadb.org/mariadb_release_signing_key.asc
-    state: present
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ mysql ]
-- name: Add MariaDB repo
-  apt_repository:
-    repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/ubuntu {{ ansible_distribution_release }} main"
-    state: present
-  when: ansible_distribution == "Ubuntu"
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ mysql ]
-- name: Add MariaDB repo
-  apt_repository:
-    repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/debian {{ ansible_distribution_release }} main"
-    state: present
-  register: mariadb_debian_repo
-  when: ansible_distribution == "Debian"
-  become: yes
-  become_method: sudo
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
-  tags: [ mysql ]
-- name: Install MariaDB
+- name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
   apt:
-    name:
-    - mariadb-client
-    - mariadb-common
-    - mariadb-server
     update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_facts['os_family'] == 'Debian'
   become: yes
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
-  tags: [ mysql ]
-- name: Start service mysql, if not started
-  service:
-    name: mysql
-    state: started
+
+- name: Update homebrew cache
+  homebrew:
+    update_homebrew: yes
+  when: ansible_facts['os_family'] == 'Darwin'
+
+- block:
+
+  - name: Add Mariadb apt key
+    apt_key:
+      url: https://mariadb.org/mariadb_release_signing_key.asc
+      state: present
+    when: ansible_facts['os_family'] == 'Debian'
+    tags: [ mysql ]
+
+  - name: Add MariaDB repo
+    apt_repository:
+      repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/ubuntu {{ ansible_distribution_release }} main"
+      state: present
+    when: ansible_distribution == "Ubuntu"
+    tags: [ mysql ]
+
+  - name: Add MariaDB repo
+    apt_repository:
+      repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/debian {{ ansible_distribution_release }} main"
+      state: present
+    register: mariadb_debian_repo
+    when: ansible_distribution == "Debian"
+    tags: [ mysql ]
+
+  - name: Install MariaDB
+    package:
+      name:
+      - mariadb-client
+      - mariadb-common
+      - mariadb-server
+      state: latest
+    tags: [ mysql ]
+    when: ansible_facts['os_family'] == 'Debian'
+
+  - name: Install MariaDB
+    package:
+      name:
+      - mariadb
+      state: latest
+    tags: [ mysql ]
+    when: ansible_facts['os_family'] == 'Darwin'
+
+  - name: Start service mysql, if not started
+    service:
+      name: mysql
+      state: started
+    tags: [ mysql ]
+
   become: yes
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
-  tags: [ mysql ]
+
 - name: Removes all anonymous user accounts
   mysql_user:
     check_implicit_admin: yes
@@ -59,6 +76,7 @@
     host_all: yes
     state: absent
   tags: [ mysql ]
+  
 - name: Create database user
   mysql_user:
     login_user: root

@@ -13,6 +13,9 @@
     mysql_user: 'dev'
     mysql_password: 'dev'
   tasks:
+  - name: Check current user
+    fail: msg="Do not run ansible-playbook as root"
+    when: ansible_env.USER == 'root'
   - pause:
       prompt: "\n\n\nplease enter the path for domain {{ domain }} [/var/www/html/{{ domain }}/public_html]"
     register: domain_path
