@@ -141,7 +141,7 @@
   
   - name: Correct group for php-fpm
     lineinfile:
-      path: /usr/local/etc/php/7.2/php-fpm.d/www.conf 
+      path: /usr/local/etc/php/7.4/php-fpm.d/www.conf 
       regexp: '^group ='
       line: "group = staff"
       state: present
