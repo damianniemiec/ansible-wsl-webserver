@@ -11,7 +11,7 @@
 
   - name: Setup configuration files for selected domains
     template:
-      src: "templates/vhost.j2"
+      src: "templates/vhost-macos.j2"
       dest: "/usr/local/etc/httpd/vhosts/{{ item.name }}.conf"
       decrypt: yes
     loop: "{{ created_domains }}"

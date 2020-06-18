@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+    ServerName {{ item.domain }}
+    ServerAdmin webmaster@{{ item.domain }}
+    DocumentRoot {{ item.path }}
+
+    ErrorLog /var/log/apache2/{{ item.domain }}_error.log
+    CustomLog /var/log/apache2/{{ item.domain }}_access.log combined
+
+    <FilesMatch \.php$>
+        SetHandler "proxy:fcgi://localhost:9070/"
+    </FilesMatch>
+
+    <Directory {{ item.path }}>
+        Options FollowSymLinks
+        DirectoryIndex index.php
+        AllowOverride All
+        Require all granted
+    </directory>
+</VirtualHost>
