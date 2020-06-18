@@ -69,11 +69,14 @@
     when: ansible_facts['os_family'] == 'Darwin'
     become: no
 
-  - name: Removes root password
-    command: "mysql -u root -e \"update mysql.user set plugin = '' \""
-    tags: [ mysql ]
+  - pause:
+      seconds: 20
     when: ansible_facts['os_family'] == 'Darwin'
-    become: yes
+    
+  - name: Removes root password
+    shell: >
+      "$(brew --prefix mysql)/bin/mysqladmin -u root password ''"
+    when: ansible_facts['os_family'] == 'Darwin'
 
   - name: Removes all anonymous user accounts
     mysql_user:
