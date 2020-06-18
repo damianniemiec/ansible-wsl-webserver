@@ -39,6 +39,7 @@
       name:
         - pymysql
         - docker
+    become: yes
     when: ansible_facts['os_family'] == 'Darwin'
   
   become: "{{ 'no' if ansible_facts['os_family'] == 'Darwin' else 'yes' }}"
