@@ -126,7 +126,7 @@
   - name: Enable Apache2 modules
     lineinfile:
       path: /usr/local/etc/httpd/httpd.conf
-      line: "LoadModule rewrite_module lib/httpd/modules/mod_{{ item }}.so"
+      line: "LoadModule {{ item }}_module lib/httpd/modules/mod_{{ item }}.so"
       state: present
     loop:
       - deflate
