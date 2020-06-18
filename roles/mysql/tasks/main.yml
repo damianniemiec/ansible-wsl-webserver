@@ -61,6 +61,13 @@
       name: mysql
       state: started
     tags: [ mysql ]
+    when: ansible_facts['os_family'] == 'Debian'
+
+  - name: Start service mysql, if not started
+    command: "brew services restart mariadb"
+    tags: [ mysql ]
+    when: ansible_facts['os_family'] == 'Darwin'
+    become: no
 
   become: yes
   become_method: sudo
