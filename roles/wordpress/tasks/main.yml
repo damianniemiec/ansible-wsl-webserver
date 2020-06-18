@@ -100,6 +100,24 @@
 - include_role:
     name: "apache2"
     tasks_from: setup-hosts
+
+- name: Restart service apache2
+  service:
+    name: apache2
+    state: restarted
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Restart service apache2
+  shell: apachectl restart
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  when: ansible_facts['os_family'] == 'Darwin'
     
 - debug:
     msg: 'If run in WSL add `127.0.0.1 {{ domain }}` to `C:\Windows\System32\drivers\etc\hosts`'
