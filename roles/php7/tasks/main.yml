@@ -182,6 +182,7 @@
     shell: phpenmod {{ item }}
     loop: "{{ php_extensions }}"
     tags: [ php, php74 ]
+    when: ansible_facts['os_family'] == 'Debian'
 
   become: yes
   become_method: sudo
