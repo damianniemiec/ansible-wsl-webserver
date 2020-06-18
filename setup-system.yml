@@ -21,7 +21,7 @@
     - php7.4-xml
     - php7.4-zip
     created_domains:
-    - { name: 'phpmyadmin', domain: 'pma.local', path: '/var/www/html/phpmyadmin' }
+    - { name: 'phpmyadmin', domain: 'pma.local', path: "{{ '/usr/local/var/www/phpmyadmin' if ansible_facts['os_family'] == 'Darwin' else '/var/www/html/phpmyadmin' }}" }
     enabled_sites:
     - { name: 'phpmyadmin' }
 
