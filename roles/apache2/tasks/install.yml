@@ -68,6 +68,15 @@
     notify:
     - restart apache2
 
+  - name: Ensure vhosts directory exists
+    file:
+      path: /usr/local/etc/httpd/vhosts
+      state: directory
+      mode: '0755'
+      owner: "{{ ansible_env.USER }}"
+      group: admin
+    when: ansible_facts['os_family'] == 'Darwin'
+    
   - name: Ensure Mac Os X include vhosts
     lineinfile:
       path: "/usr/local/etc/httpd/httpd.conf"

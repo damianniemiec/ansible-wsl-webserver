@@ -6,3 +6,8 @@
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: restart php7
+  command: php-fpm
+  when: ansible_facts['os_family'] == 'Darwin'
