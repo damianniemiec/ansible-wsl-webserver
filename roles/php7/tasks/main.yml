@@ -60,7 +60,6 @@
       - php7.4-fpm
       state: latest
     tags: [ php, php74 ]
-    become: yes
     when: ansible_facts['os_family'] == 'Debian'
 
   - name: Install PHP7
@@ -68,6 +67,7 @@
       name: php@7.4
       state: present
     tags: [ php, php74 ]
+    become: no
     when: ansible_facts['os_family'] == 'Darwin'
 
   - name: Copy PHP configuration file
@@ -91,14 +91,6 @@
     tags: [ php, php74 ]
     become: "{{ 'no' if ansible_facts['os_family'] == 'Darwin' else 'yes' }}"
     when: ansible_facts['os_family'] == 'Debian'
-
-  - name: Enable Apache2 module
-    apache2_module:
-      state: present
-      name: proxy_fcgi
-    tags: [ php, apache ]
-    notify:
-    - restart apache2
 
   - name: Ensure php proxy is present in apache default config
     blockinfile:

@@ -106,6 +106,41 @@
     notify:
     - restart apache2
 
+  - name: Enable Apache2 modules
+    apache2_module:
+      state: present
+      name: "{{ item }}"
+    loop:
+      - deflate
+      - mime_magic
+      - expires
+      - proxy
+      - proxy_http
+      - proxy_fcgi
+      - rewrite
+    tags: [ php, apache ]
+    when: ansible_facts['os_family'] == 'Debian'
+    notify:
+    - restart apache2
+  
+  - name: Enable Apache2 modules
+    lineinfile:
+      path: /usr/local/etc/httpd/httpd.conf
+      line: "LoadModule rewrite_module lib/httpd/modules/mod_{{ item }}.so"
+      state: present
+    loop:
+      - deflate
+      - mime_magic
+      - expires
+      - proxy
+      - proxy_http
+      - proxy_fcgi
+      - rewrite
+    tags: [ php, apache ]
+    when: ansible_facts['os_family'] == 'Darwin'
+    notify:
+    - restart apache2
+
   - name: Start service apache2, if not started
     service:
       name: apache2
