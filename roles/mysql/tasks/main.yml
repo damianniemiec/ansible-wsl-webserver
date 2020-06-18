@@ -70,13 +70,16 @@
     become: no
 
   - pause:
-      seconds: 20
+      seconds: 5
+    tags: [ mysql ]
     when: ansible_facts['os_family'] == 'Darwin'
     
   - name: Removes root password
     shell: >
-      "$(brew --prefix mysql)/bin/mysqladmin -u root password ''"
+      $(brew --prefix mariadb)/bin/mysqladmin -u root password ''
+    tags: [ mysql ]
     when: ansible_facts['os_family'] == 'Darwin'
+    become: yes
 
   - name: Removes all anonymous user accounts
     mysql_user:
