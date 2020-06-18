@@ -48,4 +48,5 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
     pip install ansible --user
     echo 'export PATH="/Users/$USER/Library/Python/2.7/bin:$PATH"' >> ~/.zshrc
     echo 'export PATH="/usr/local/sbin:$PATH"' >> ~/.zshrc
+    source ~/.zshrc
 fi

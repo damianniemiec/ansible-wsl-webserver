@@ -150,17 +150,6 @@
     notify:
     - restart php7
 
-  - name: Correct log path for php-fpm
-    lineinfile:
-      path: /usr/local/etc/php/7.4/php-fpm.conf
-      regexp: '^error_log = '
-      line: "error_log = /var/log/php-fpm.log"
-      state: present
-    tags: [ php, php74 ]
-    when: ansible_facts['os_family'] == 'Darwin'
-    notify:
-    - restart php7
-
   - name: Start service php7.4-fpm, if not started
     service:
       name: php7.4-fpm
@@ -169,7 +158,7 @@
     when: ansible_facts['os_family'] == 'Debian'
   
   - name: Start service php7.4-fpm, if not started
-    command: "php-fpm"
+    command: "brew services restart php@7.4"
     tags: [ php, php74 ]
     when: ansible_facts['os_family'] == 'Darwin'
 
