@@ -24,6 +24,12 @@
     package:
       name:
       - python-apt
+      state: latest
+    when: ansible_facts['os_family'] == 'Debian'
+
+  - name: Install system software
+    package:
+      name:
       - git
       - curl
       state: latest
