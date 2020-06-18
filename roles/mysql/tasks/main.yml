@@ -70,7 +70,7 @@
     become: no
 
   - pause:
-      seconds: 5
+      seconds: 10
     tags: [ mysql ]
     when: ansible_facts['os_family'] == 'Darwin'
     
