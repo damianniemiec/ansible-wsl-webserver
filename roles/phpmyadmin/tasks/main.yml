@@ -81,7 +81,7 @@
 
   - name: Change blowfish secret with random
     lineinfile:
-      path: /etc/phpmyadmin/config.inc.php
+      path: /usr/local/etc/phpmyadmin.config.inc.php
       regexp: \$cfg\['blowfish_secret'\] =
       line: $cfg['blowfish_secret'] = '{{ lookup('password', '/dev/null chars=ascii_letters length=32') }}';
     tags: [ phpmyadmin ]
