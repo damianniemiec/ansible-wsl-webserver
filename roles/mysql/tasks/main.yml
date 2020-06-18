@@ -54,6 +54,7 @@
       state: latest
     tags: [ mysql ]
     when: ansible_facts['os_family'] == 'Darwin'
+    become: no
 
   - name: Start service mysql, if not started
     service:

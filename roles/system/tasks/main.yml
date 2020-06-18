@@ -28,7 +28,7 @@
       - curl
       state: latest
   
-  become: yes
+  become: "{{ 'no' if ansible_facts['os_family'] == 'Darwin' else 'yes' }}"
   become_method: sudo
   vars:
     ansible_become_password: "{{ sudo_password }}"
