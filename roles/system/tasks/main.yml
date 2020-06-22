@@ -33,7 +33,6 @@
       name:
       - git
       - curl
-      - composer
       state: latest
 
   - name: Install python modules with pip
@@ -43,6 +42,14 @@
         - docker
     become: yes
     when: ansible_facts['os_family'] == 'Darwin'
+
+  - name: Download composer installer
+    get_url:
+      url: https://getcomposer.org/installer
+      dest: /tmp/composer-setup.php
+  
+  - name: Install composer
+    command: php /tmp/composer-setup.php --install-dir=/usr/bin/ --filename=composer
   
   become: "{{ 'no' if ansible_facts['os_family'] == 'Darwin' else 'yes' }}"
   become_method: sudo
@@ -59,6 +66,21 @@
         - docker
       extra_args: --user
     when: ansible_facts['os_family'] == 'Debian'
+
+  - name: Add composer to PATH
+    lineinfile:
+      path: "$HOME/.bashrc"
+      line: 'export PATH="$HOME/.config/composer/vendor/bin:$PATH"'
+      state: present
+    
+  - shell: . "$HOME/.bashrc"
+
+  - name: Install global composer modules
+    composer:
+      command: require
+      global_command: yes
+      arguments: "wp-cli/wp-cli-bundle"
+      prefer_dist: yes
     
   - name: Install nvm
     shell: >
