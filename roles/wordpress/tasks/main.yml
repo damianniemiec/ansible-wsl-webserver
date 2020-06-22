@@ -52,19 +52,18 @@
   tags: [ wordpress ]
 
 - block:
-
   - set_fact:
       mysql_db: 'wp_{{ 10000 | random }}'
 
   - set_fact:
       created_databases:
-      - { name: '{{ mysql_db }}' }
+      - { name: "{{ mysql_db }}" }
 
   - include_role:
       name: mysql
       tasks_from: create-databases
+  
   rescue:
-
   - set_fact:
       mysql_db: 'wp_{{ 10000 | random }}'
 

@@ -1,6 +1,7 @@
 - name: Install homebrew (it takes a while)
   shell: >
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  when: ansible_facts['os_family'] == 'Darwin'
 
 - name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
   apt:
@@ -32,6 +33,7 @@
       name:
       - git
       - curl
+      - composer
       state: latest
 
   - name: Install python modules with pip

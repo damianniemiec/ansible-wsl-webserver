@@ -32,6 +32,10 @@
     vars:
       ansible_become_password: "{{ sudo_password }}"
     when: ansible_facts['os_family'] == 'Debian'
+  
+  - name: Start mailhog
+    shell: ~/go/bin/MailHog > /dev/null 2>&1 &
+    when: ansible_facts['os_family'] == 'Debian'
 
   - block:
     - name: Start service apache2, if not started
@@ -47,4 +51,8 @@
     become_method: sudo
     vars:
       ansible_become_password: "{{ sudo_password }}"
+    when: ansible_facts['os_family'] == 'Darwin'
+
+  - name: Start mailhog
+    shell: mailhog
     when: ansible_facts['os_family'] == 'Darwin'

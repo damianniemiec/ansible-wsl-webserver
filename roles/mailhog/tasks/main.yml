@@ -1,0 +1,59 @@
+- name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_facts['os_family'] == 'Debian'
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+
+- name: Update homebrew cache
+  homebrew:
+    update_homebrew: yes
+  when: ansible_facts['os_family'] == 'Darwin'
+
+- name: Install Go
+  package:
+    name:
+    - golang-go
+    state: latest
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- set_fact:
+    go_path: "{{ lookup('env', 'GOPATH') | default(ansible_env.HOME+'/go', true) }}"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: go get mailhog
+  shell: go get -u github.com/mailhog/MailHog
+  environment:
+    GOPATH: "{{ go_path }}"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: go get mhsendmail
+  shell: go get -u github.com/mailhog/mhsendmail
+  environment:
+    GOPATH: "{{ go_path }}"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Set date.timezone for FPM
+  lineinfile:
+    dest: /etc/php/7.4/fpm/php.ini
+    regexp: "sendmail_path ="
+    line: "sendmail_path = /home/{{ ansible_user }}/go/bin/mhsendmail"
+  tags: [ php, php74 ]
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  when: ansible_facts['os_family'] == 'Debian'
+  
+- homebrew:
+    name: mailhog
+    state: latest
+  when: ansible_facts['os_family'] == 'Darwin'
+
