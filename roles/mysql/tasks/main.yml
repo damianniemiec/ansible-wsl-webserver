@@ -24,14 +24,14 @@
 
   - name: Add MariaDB repo
     apt_repository:
-      repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/ubuntu {{ ansible_distribution_release }} main"
+      repo: "deb [arch=amd64,arm64,ppc64el] http://ftp.icm.edu.pl/pub/unix/database/mariadb/repo/10.3/ubuntu {{ ansible_distribution_release }} main"
       state: present
     when: ansible_distribution == "Ubuntu"
     tags: [ mysql ]
 
   - name: Add MariaDB repo
     apt_repository:
-      repo: "deb [arch=amd64] http://ftp.bme.hu/pub/mirrors/mariadb/repo/10.3/debian {{ ansible_distribution_release }} main"
+      repo: "deb [arch=amd64] http://ftp.icm.edu.pl/pub/unix/database/mariadb/repo/10.3/debian {{ ansible_distribution_release }} main"
       state: present
     register: mariadb_debian_repo
     when: ansible_distribution == "Debian"
