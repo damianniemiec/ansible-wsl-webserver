@@ -9,6 +9,10 @@
     prompt: "Enter domain name"
     private: no
     default: "wordpress.local"
+  - name: install_project_files
+    prompt: "Copy default project files? [yes/no]"
+    private: no
+    default: "yes"
   vars:
     mysql_user: 'dev'
     mysql_password: 'dev'

@@ -1,0 +1,41 @@
+{
+  "extends": [
+    "stylelint-config-recommended"
+  ],
+  "ignoreFiles": [
+    "wp-content/plugins/**/*",
+    "wp-content/themes/twenty*/**/*"
+  ],
+  "rules": {
+    "at-rule-no-unknown": null,
+    "block-opening-brace-space-before": null,
+    "color-hex-case": "lower",
+    "declaration-block-no-duplicate-properties": true,
+    "declaration-colon-space-after": "always",
+    "color-hex-length": "short",
+    "indentation": [
+      2,
+      {
+        "severity": "warning"
+      }
+    ],
+    "max-empty-lines": 2,
+    "number-leading-zero": "always",
+    "no-descending-specificity": null,
+    "no-eol-whitespace": [
+      true,
+      {
+        "ignore": [
+          "empty-lines"
+        ]
+      }
+    ],
+    "property-no-unknown": true,
+    "block-no-empty": [
+      true,
+      {
+        "severity": "warning"
+      }
+    ]
+  }
+}

@@ -88,6 +88,20 @@
     ansible_become_password: "{{ sudo_password }}"
   tags: [ wordpress ]
 
+- name: Copy default project files
+  copy:
+    src: "files/webpack-default-setup/"
+    dest: "{{ wordpress_path }}"
+    owner: '{{ ansible_env.USER }}'
+    group: "{{ 'admin' if ansible_facts['os_family'] == 'Darwin' else ansible_env.USER }}"
+    mode: '0755'
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_become_password: "{{ sudo_password }}"
+  tags: [ wordpress ]
+  when: install_project_files == 'yes'
+
 - name: Setup domain
   set_fact:
     created_domains:

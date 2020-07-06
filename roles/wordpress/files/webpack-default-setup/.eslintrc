@@ -1,0 +1,21 @@
+{
+  "root": true,
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "env": {
+    "browser": true,
+    "amd": true,
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "plugins": ["prettier"],
+  "rules": {
+    "quotes": [1, "single"],
+    "semi": "warn",
+    "no-unused-vars": "warn",
+    "no-inner-declarations": 0,
+    "prettier/prettier": "warn"
+  }
+}
