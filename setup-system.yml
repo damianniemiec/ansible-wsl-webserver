@@ -22,8 +22,10 @@
     - php7.4-zip
     created_domains:
     - { name: 'phpmyadmin', domain: 'pma.local', path: "{{ '/usr/local/var/www/phpmyadmin' if ansible_facts['os_family'] == 'Darwin' else '/var/www/html/phpmyadmin' }}" }
+    - { name: 'mailhog', domain: 'mailhog.local', proxy: "http://localhost:8025/" }
     enabled_sites:
     - { name: 'phpmyadmin' }
+    - { name: 'mailhog' }
 
   tasks:
   - name: Check current user

@@ -6,6 +6,7 @@
 * Homebrew
 * PHPMyAdmin
 * Wordpress
+* Mailhog
 
 # Ansible system setup
 How to install ansible: https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-ubuntu
@@ -80,7 +81,10 @@ Edit `C:\Windows\System32\drivers\etc\hosts` in text editor as administrator and
 `ansible-playbook run-server.yml`
 
 ## phpMyAdmin
-use `http://localhost/phpmyadmin` or run `ansible-playbook setup-hosts.yml` and add `pma.local` to windows hosts file
+use `http://localhost/phpmyadmin` or add `pma.local` to windows hosts file (if WSL)
 
-### Wordpress
+## mailhog
+use `http://localhost:8025` or add `mailhog.local` to windows hosts file (if WSL)
+
+## Wordpress
 To install wordpress run `ansible-playbook setup-wordpress.yml` and follow instructions
